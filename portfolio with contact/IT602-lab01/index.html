@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gem Mamale</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="font-sans transition-colors duration-300">
+
+
+<nav class="fixed top-0 w-full bg-black/40 text-white z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="text-xl font-bold">GM</div>
+
+    
+    <ul class="hidden md:flex space-x-6">
+      <li><a href="#" class="hover:text-indigo-300">Home</a></li>
+      <li><a href="#about" class="hover:text-indigo-300">About</a></li>
+      <li><a href="#contact" class="hover:text-indigo-300">Contact</a></li>
+    </ul>
+
+    
+    <div class="flex items-center gap-3">
+      <button id="darkToggle" class="bg-white text-black px-3 py-1 rounded text-sm">
+        Dark
+      </button>
+      <button id="menuBtn" class="md:hidden text-2xl">☰</button>
+    </div>
+  </div>
+
+  
+  <ul id="mobileMenu" class="hidden md:hidden bg-black/80 text-center">
+    <li class="py-2"><a href="#">Home</a></li>
+    <li class="py-2"><a href="#about">About</a></li>
+    <li class="py-2"><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+
+<header class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-green-800 text-white text-center px-6 pt-24">
+  <div>
+    <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold mb-4">
+      GEM MAMALE
+    </h1>
+    <p class="text-base sm:text-lg md:text-xl mb-8">
+      We Build Your Design
+    </p>
+    <a href="#contact" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-100 transition">
+      Let’s Talk
+    </a>
+  </div>
+</header>
+
+
+<section id="about" class="py-16 sm:py-20 px-6 text-center bg-white dark:bg-gray-900 dark:text-white">
+  <h2 class="text-2xl sm:text-3xl font-bold mb-4">About Me</h2>
+  <p class="max-w-xl mx-auto text-gray-600 dark:text-gray-300">
+    I’m a creative designer focused on building clean, modern,
+    and user-friendly designs that bring ideas to life.
+  </p>
+</section>
+
+
+<section id="contact" class="py-16 sm:py-20 px-6 bg-gray-100 dark:bg-gray-800 dark:text-white">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-10">Contact Me</h2>
+
+    
+    <form id="contactForm" class="bg-white dark:bg-gray-900 p-6 rounded shadow space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input id="name" placeholder="Name" required class="border p-3 rounded w-full dark:bg-gray-800"/>
+        <input id="contactNo" placeholder="Contact No." required class="border p-3 rounded w-full dark:bg-gray-800"/>
+      </div>
+
+      <input id="email" type="email" placeholder="Email" required class="border p-3 rounded w-full dark:bg-gray-800"/>
+      <textarea id="message" rows="4" placeholder="Message" required class="border p-3 rounded w-full dark:bg-gray-800"></textarea>
+
+      <button id="submitBtn" class="w-full bg-indigo-600 text-white py-3 rounded font-semibold">
+        Submit
+      </button>
+    </form>
+
+    
+    <div class="hidden md:block mt-10 overflow-x-auto">
+      <table class="min-w-full bg-white dark:bg-gray-900 rounded shadow text-sm">
+        <thead class="bg-indigo-600 text-white">
+          <tr>
+            <th class="p-3">Name</th>
+            <th class="p-3">Contact</th>
+            <th class="p-3">Email</th>
+            <th class="p-3">Message</th>
+            <th class="p-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    
+    <div id="cardList" class="md:hidden mt-10 space-y-4"></div>
+  </div>
+</section>
+
+
+<script>
+  const body = document.body;
+  const darkToggle = document.getElementById("darkToggle");
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const form = document.getElementById("contactForm");
+  const tableBody = document.getElementById("tableBody");
+  const cardList = document.getElementById("cardList");
+  const submitBtn = document.getElementById("submitBtn");
+
+  let editIndex = null;
+
+  
+  if (localStorage.getItem("dark") === "true") {
+    body.classList.add("dark");
+    darkToggle.textContent = "Light";
+  }
+
+  darkToggle.onclick = () => {
+    body.classList.toggle("dark");
+    const isDark = body.classList.contains("dark");
+    localStorage.setItem("dark", isDark);
+    darkToggle.textContent = isDark ? "Light" : "Dark";
+  };
+
+  menuBtn.onclick = () => mobileMenu.classList.toggle("hidden");
+
+  function loadData() {
+    const data = JSON.parse(localStorage.getItem("contacts")) || [];
+    tableBody.innerHTML = "";
+    cardList.innerHTML = "";
+
+    data.forEach((item, index) => {
+      tableBody.innerHTML += `
+        <tr class="border-b text-center">
+          <td class="p-3">${item.name}</td>
+          <td class="p-3">${item.contact}</td>
+          <td class="p-3">${item.email}</td>
+          <td class="p-3">${item.message}</td>
+          <td class="p-3 space-x-2">
+            <button onclick="editEntry(${index})" class="text-blue-500">Edit</button>
+            <button onclick="deleteEntry(${index})" class="text-red-500">Delete</button>
+          </td>
+        </tr>
+      `;
+
+      cardList.innerHTML += `
+        <div class="bg-white dark:bg-gray-900 p-4 rounded shadow">
+          <p><strong>Name:</strong> ${item.name}</p>
+          <p><strong>Contact:</strong> ${item.contact}</p>
+          <p><strong>Email:</strong> ${item.email}</p>
+          <p><strong>Message:</strong> ${item.message}</p>
+          <div class="mt-2 space-x-3">
+            <button onclick="editEntry(${index})" class="text-blue-500">Edit</button>
+            <button onclick="deleteEntry(${index})" class="text-red-500">Delete</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  form.onsubmit = e => {
+    e.preventDefault();
+    const data = JSON.parse(localStorage.getItem("contacts")) || [];
+
+    const entry = {
+      name: name.value,
+      contact: contactNo.value,
+      email: email.value,
+      message: message.value
+    };
+
+    if (editIndex !== null) {
+      data[editIndex] = entry;
+      editIndex = null;
+      submitBtn.textContent = "Submit";
+    } else {
+      data.push(entry);
+    }
+
+    localStorage.setItem("contacts", JSON.stringify(data));
+    form.reset();
+    loadData();
+  };
+
+  window.editEntry = index => {
+    const data = JSON.parse(localStorage.getItem("contacts"));
+    const item = data[index];
+    name.value = item.name;
+    contactNo.value = item.contact;
+    email.value = item.email;
+    message.value = item.message;
+    editIndex = index;
+    submitBtn.textContent = "Update";
+  };
+
+  window.deleteEntry = index => {
+    if (!confirm("Delete this entry?")) return;
+    const data = JSON.parse(localStorage.getItem("contacts"));
+    data.splice(index, 1);
+    localStorage.setItem("contacts", JSON.stringify(data));
+    loadData();
+  };
+
+  loadData();
+</script>
+
+</body>
+</html>
